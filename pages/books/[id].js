@@ -1,34 +1,40 @@
 import axios from 'axios';
 import Layout from '../../components/layout.js';
-import { getIds, getTitles } from '../../api/getBooks.js';
+import { getIds, getTitles, getChapters } from '../../api/getBooks.js';
 
-export default function Book({ paths }){
-  console.log(paths);
+export default function Book({ title, chapters }){
+  const chapterList = chapters.map((chap) => {
+    return <li key={chapters.indexOf(chap)}>{chap.chapter}</li>
+  })
   return (
     <Layout>
-      <h1>This is just a placeholder to test that the routing is working.</h1>
-      <h2>This contains a prop! {paths[0].title}</h2>
+      <h1>{title[0].title}</h1>
+      <ul>
+        {chapterList}
+      </ul>
     </Layout>
   )
 }
-
 
 export async function getStaticProps({ params }){
 
     return {
       props : {
-        paths: await getTitles(params).then((res) => {
+        title: await getTitles(params).then((res) => {
+          return res
+        }),
+        chapters: await getChapters(params).then((res) => {
           return res
         })
       }
     }
 }
 
-
 export async function getStaticPaths(){
 
   return {
     paths:  await getIds().then((res) => {
+      console.log(res)
       return res
     }),
     fallback: false
