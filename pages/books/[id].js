@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Layout from '../../components/layout.js';
-import { getBooks } from '../../api/getBooks.js';
+import { getIds, getTitles } from '../../api/getBooks.js';
 
 export default function Book({ paths }){
   console.log(paths);
@@ -12,24 +12,14 @@ export default function Book({ paths }){
   )
 }
 
-//pass in object
+
 export async function getStaticProps({ params }){
-  console.log('params' + params)
-  const paths = await axios.get(' https://the-one-api.dev/v2/book/' + params.id).then((res) => {
-    console.log(res.data);
-      const books =  res.data.docs.map(obj => {
-        return {
-            title: obj.name
-        }
-      })
-      return books;
-    }).catch((err) => {
-      console.log(err);
-    })
-    console.log('props' + paths)
+
     return {
       props : {
-        paths
+        paths: await getTitles(params).then((res) => {
+          return res
+        })
       }
     }
 }
@@ -37,23 +27,10 @@ export async function getStaticProps({ params }){
 
 export async function getStaticPaths(){
 
-  const paths = await axios.get(' https://the-one-api.dev/v2/book').then((res) => {
-    console.log(res.data.docs)
-      const ids =  res.data.docs.map(obj => {
-        return {
-          params : {
-            id : obj._id
-          }
-        }
-      })
-      console.log(ids);
-      return ids;
-    }).catch((err) => {
-      console.log(err);
-    })
-    console.log('paths' + paths);
   return {
-    paths,
+    paths:  await getIds().then((res) => {
+      return res
+    }),
     fallback: false
   }
 }
